@@ -1,0 +1,71 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+Все новости
+{% endblock title %}
+
+{% block content %}
+<center><h1 style="margin-top: 8px;">Все новости</h1></center>
+<form action="" method="get">
+       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+       {{ filterset.form.as_p }}
+       {# Добавим кнопку отправки данных формы #}
+       <input type="submit" value="Найти" />
+   </form>
+<hr>
+{% if news %}
+<center><table class="post_table">
+           <tr>
+               <td>Заголовок:</td>
+               <td>Тип поста:</td>
+               <td>Текст новости/поста:</td>
+               <td>Категория:</td>
+               <td>Дата публикации:</td>
+               <td>Рейтинг поста:</td>
+           </tr>
+           {% for new in news %}
+           <tr>
+              <tr>
+          <td><a href="{{ new.pk }}">{{ new.header_post|truncatechars:15 }}</a></td>
+            {% if new.type_post == 'AR' %}
+         <td>Статья</td>
+         {% else %}
+            <td>Новость</td>
+            {% endif %}
+            <td>{{ new.text_post|truncatechars:20 }}</td>
+            <td>
+             {% for category in new.category_post.all %}
+                <a href="{% url 'category_news' category.pk %}"> {{ category }} </a>
+             {% endfor %}
+    </td>
+    <td>{{ new.date_post|date:'d M Y' }}</td>
+    <td>{{ new.rating_post }}</td>
+           {% endfor %}
+</table></center>
+
+
+<br><center>
+{% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+{{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+</center>
+
+{% else %}
+<center><h2>Новостей нет!</h2></center>
+{% endif %}
+<hr>
+<center>.</center>
+{% endblock content %}
